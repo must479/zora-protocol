@@ -1,5 +1,49 @@
 # @zoralabs/protocol-deployments
 
+## 0.1.9
+
+### Patch Changes
+
+- f4641f4b: Removed dependencies from `zora-1155-contracts`, `1155-deployments`, `mints-contracts`, and `mints-deployments`
+
+## 0.1.8
+
+### Patch Changes
+
+- 8e514b7: Deployed lateset MintsEthUnwrapperAndCaller to chains
+
+## 0.1.7
+
+### Patch Changes
+
+- b6fc3a4: Deployed latest ZoraMintsManagerImpl to zora and zora-sepolia
+- 5e6a4b0: Added Protocol Rewards and ERC20 Minter abis and addresses to protocol-deployments
+
+## 0.1.6
+
+### Patch Changes
+
+- 9a16b81: Remove graphql-request from hard dependencies in protocol sdk
+
+## 0.1.5
+
+### Patch Changes
+
+- 042edbe: Chain ids in published protocol-deployments package are now numbers instead of strings
+- 50a4e09: Includes MINTs contracts abis and addresses
+
+## 0.1.4
+
+### Patch Changes
+
+- c2a0a2b: Moved dependencies to devDependencies since they are not needed by external users of the package, they are only used for codegen
+
+## 0.1.3
+
+### Patch Changes
+
+- bb163d3: New preminter impl deployed to mainnet chains
+
 ## 0.1.2
 
 ### Patch Changes
@@ -12,7 +56,7 @@
 
 ### Patch Changes
 
-- 8d6163c: Deployed to blast & blast sepolia
+- 8d6163c: Deployed to blast & blast sepolia.
 
 ## 0.1.0
 

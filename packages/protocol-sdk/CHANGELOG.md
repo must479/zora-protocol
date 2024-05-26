@@ -1,5 +1,51 @@
 # @zoralabs/protocol-sdk
 
+## 0.5.12
+
+### Patch Changes
+
+- e2452f7d: Removed `zora-1155-contracts`, `1155-deployments`, `mints-contracts`, and `mints-deployments` from devDependencies hierarchy.
+
+## 0.5.11
+
+### Patch Changes
+
+- 8e514b7: Cleanup protocol-sdk to have better docs around all methods, and remove methods that do not need to be exported and are not used.
+- 598a95b: Bumps protocol-sdk to use viem@2.x- see the [viem 2.X.X migration guide](https://viem.sh/docs/migration-guide#2xx-breaking-changes) for breaking changes when migratring from viem 1.X.X to 2.X.X
+- Updated dependencies [8e514b7]
+  - @zoralabs/protocol-deployments@0.1.8
+
+## 0.5.10
+
+### Patch Changes
+
+- Updated dependencies [9a16b81]
+  - @zoralabs/protocol-deployments@0.1.6
+
+## 0.5.9
+
+### Patch Changes
+
+- 825e5f7: Adds optional `createReferral` to `createNew1155Token` params
+
+## 0.5.8
+
+### Patch Changes
+
+- 50a4e09: Added sdk method to get total MINT balance
+- Updated dependencies [042edbe]
+- Updated dependencies [50a4e09]
+  - @zoralabs/protocol-deployments@0.1.5
+
+## 0.5.7
+
+### Patch Changes
+
+- 2eda168: Update default premint version to v2
+- 4066420: Adding protocol SDK to base and sepolia networks
+- Updated dependencies [bb163d3]
+  - @zoralabs/protocol-deployments@0.1.3
+
 ## 0.5.6
 
 ### Patch Changes

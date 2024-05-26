@@ -36,6 +36,7 @@ abstract contract ZoraDeployerBase is DeploymentTestingUtils, ScriptDeploymentCo
         vm.serializeAddress(deploymentJsonKey, PREMINTER_PROXY, deployment.preminterProxy);
         vm.serializeAddress(deploymentJsonKey, PREMINTER_IMPL, deployment.preminterImpl);
         vm.serializeAddress(deploymentJsonKey, UPGRADE_GATE, deployment.upgradeGate);
+        vm.serializeAddress(deploymentJsonKey, ERC20_MINTER, deployment.erc20Minter);
         deploymentJson = vm.serializeAddress(deploymentJsonKey, FACTORY_PROXY, deployment.factoryProxy);
     }
 
@@ -56,6 +57,7 @@ abstract contract ZoraDeployerBase is DeploymentTestingUtils, ScriptDeploymentCo
                 upgradeGateAddress: determinsticUpgradeGateAddress(),
                 mintFeeRecipient: chainConfig.mintFeeRecipient,
                 protocolRewards: chainConfig.protocolRewards,
+                mintsManagerAddress: getDeterminsticMintsManagerAddress(),
                 merkleMinter: IMinter1155(deployment.merkleMintSaleStrategy),
                 redeemMinterFactory: IMinter1155(deployment.redeemMinterFactory),
                 fixedPriceMinter: IMinter1155(deployment.fixedPriceSaleStrategy)

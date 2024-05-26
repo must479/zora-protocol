@@ -38,6 +38,8 @@ struct Deployment {
     address preminterProxy;
     /// @notice Upgrade gate
     address upgradeGate;
+    /// @notice erc20 minter
+    address erc20Minter;
 }
 
 abstract contract DeploymentConfig is Script {
@@ -65,6 +67,7 @@ abstract contract DeploymentConfig is Script {
     string constant PREMINTER_PROXY = "PREMINTER_PROXY";
     string constant PREMINTER_IMPL = "PREMINTER_IMPL";
     string constant UPGRADE_GATE = "UPGRADE_GATE";
+    string constant ERC20_MINTER = "ERC20_MINTER";
 
     /// @notice Return a prefixed key for reading with a ".".
     /// @param key key to prefix
@@ -106,12 +109,63 @@ abstract contract DeploymentConfig is Script {
         deployment.preminterImpl = readAddressOrDefaultToZero(json, PREMINTER_IMPL);
         deployment.preminterProxy = readAddressOrDefaultToZero(json, PREMINTER_PROXY);
         deployment.upgradeGate = readAddressOrDefaultToZero(json, UPGRADE_GATE);
+        deployment.erc20Minter = readAddressOrDefaultToZero(json, ERC20_MINTER);
+    }
+
+    function getDeterminsticMintsManagerAddress() internal view returns (address) {
+        string memory json = vm.readFile("node_modules/@zoralabs/mints-deployments/deterministicConfig/mintsProxy/params.json");
+        return json.readAddress(".manager.deployedAddress");
     }
 }
 
 contract ForkDeploymentConfig is DeploymentConfig {
     function chainId() internal view override returns (uint256 id) {
         return block.chainid;
+    }
+
+    /// @notice gets the chains to do fork tests on, by reading environment var FORK_TEST_CHAINS.
+    /// Chains are by name, and must match whats under `rpc_endpoints` in the foundry.toml
+    function getForkTestChains() internal view returns (string[] memory result) {
+        try vm.envString("FORK_TEST_CHAINS", ",") returns (string[] memory forkTestChains) {
+            result = forkTestChains;
+        } catch {
+            result = new string[](0);
+        }
+    }
+
+    // check if FORK_TEST_CHAINS is set in the environment, if it is, checks if the chainName is in the list
+    // if it isn't indicates to skip testing on this fork.
+    function shouldRunTestOnFork(string memory chainName) internal view returns (bool shouldRun) {
+        string[] memory forkTestChains = getForkTestChains();
+
+        // if there is no fork test chains, run all fork tests
+        if (forkTestChains.length == 0) {
+            return true;
+        }
+
+        bytes32 chainHash = keccak256(bytes(chainName));
+
+        // if there are fork test chains in env, see if this fork test
+        // chain is contained within; if it is, then run it
+        for (uint256 i = 0; i < forkTestChains.length; i++) {
+            if (keccak256(bytes(forkTestChains[i])) == chainHash) {
+                return true;
+            }
+        }
+
+        // if not found, return false;
+        return false;
+    }
+
+    function setupForkTest(string memory chainName) internal {
+        bool shouldRun = shouldRunTestOnFork(chainName);
+
+        if (!shouldRun) {
+            vm.skip(true);
+            return;
+        }
+
+        vm.createSelectFork(chainName);
     }
 }
 

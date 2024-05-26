@@ -6,7 +6,9 @@ import {IMinter1155} from "@zoralabs/zora-1155-contracts/src/interfaces/IMinter1
 import {IZoraCreator1155PremintExecutor} from "@zoralabs/zora-1155-contracts/src/interfaces/IZoraCreator1155PremintExecutor.sol";
 import {ZoraCreator1155PremintExecutorImpl} from "@zoralabs/zora-1155-contracts/src/delegation/ZoraCreator1155PremintExecutorImpl.sol";
 import {ZoraCreator1155FactoryImpl} from "@zoralabs/zora-1155-contracts/src/factory/ZoraCreator1155FactoryImpl.sol";
-import {ZoraCreator1155Attribution, ContractCreationConfig, PremintConfigV2, TokenCreationConfigV2, PremintConfig, TokenCreationConfig} from "@zoralabs/zora-1155-contracts/src/delegation/ZoraCreator1155Attribution.sol";
+import {ZoraCreator1155Attribution} from "@zoralabs/zora-1155-contracts/src/delegation/ZoraCreator1155Attribution.sol";
+import {ContractCreationConfig, PremintConfigV2, TokenCreationConfigV2, PremintConfig, TokenCreationConfig, MintArguments, PremintResult} from "@zoralabs/shared-contracts/entities/Premint.sol";
+import {PremintEncoding} from "@zoralabs/shared-contracts/premint/PremintEncoding.sol";
 import {ScriptDeploymentConfig} from "./DeploymentConfig.sol";
 import {ZoraCreator1155Impl} from "@zoralabs/zora-1155-contracts/src/nft/ZoraCreator1155Impl.sol";
 
@@ -51,11 +53,7 @@ contract DeploymentTestingUtils is Script {
         signature = signPremint(premintConfig, deterministicAddress, creatorPrivateKey);
     }
 
-    function signAndExecutePremintV1(
-        address premintExecutorProxyAddress,
-        address payoutRecipient,
-        IZoraCreator1155PremintExecutor.MintArguments memory mintArguments
-    ) internal {
+    function signAndExecutePremintV1(address premintExecutorProxyAddress, address payoutRecipient, MintArguments memory mintArguments) internal {
         (
             ContractCreationConfig memory contractConfig,
             IZoraCreator1155PremintExecutor preminterAtProxy,
@@ -66,7 +64,7 @@ contract DeploymentTestingUtils is Script {
         uint256 quantityToMint = 1;
 
         // execute the premint
-        IZoraCreator1155PremintExecutor.PremintResult memory premintResult = preminterAtProxy.premintV1{value: mintFee(quantityToMint)}(
+        PremintResult memory premintResult = preminterAtProxy.premintV1{value: mintFee(quantityToMint)}(
             contractConfig,
             premintConfig,
             signature,
@@ -79,7 +77,8 @@ contract DeploymentTestingUtils is Script {
 
     function createAndSignPremintV2(
         address premintExecutorProxyAddress,
-        address payoutRecipient
+        address payoutRecipient,
+        uint32 uid
     )
         internal
         returns (
@@ -94,7 +93,7 @@ contract DeploymentTestingUtils is Script {
 
         premintConfig = PremintConfigV2({
             tokenConfig: TokenCreationConfigV2({
-                tokenURI: "blah.token",
+                tokenURI: "token.uri",
                 maxSupply: 100,
                 maxTokensPerAddress: 50,
                 pricePerToken: 0,
@@ -105,29 +104,25 @@ contract DeploymentTestingUtils is Script {
                 fixedPriceMinter: address(ZoraCreator1155FactoryImpl(address(preminterAtProxy.zora1155Factory())).fixedPriceMinter()),
                 createReferral: creator
             }),
-            uid: 100,
+            uid: uid,
             version: 0,
             deleted: false
         });
 
         // now interface with proxy preminter - sign and execute the premint
-        contractConfig = ContractCreationConfig({contractAdmin: creator, contractName: "blahb", contractURI: "blah.contract"});
+        contractConfig = ContractCreationConfig({contractAdmin: creator, contractName: "blahb", contractURI: "blah.contractssss"});
         address deterministicAddress = preminterAtProxy.getContractAddress(contractConfig);
 
         signature = signPremint(premintConfig, deterministicAddress, creatorPrivateKey);
     }
 
-    function signAndExecutePremintV2(
-        address premintExecutorProxyAddress,
-        address payoutRecipient,
-        IZoraCreator1155PremintExecutor.MintArguments memory mintArguments
-    ) internal {
+    function signAndExecutePremintV2(address premintExecutorProxyAddress, address payoutRecipient, MintArguments memory mintArguments) internal {
         (
             ContractCreationConfig memory contractConfig,
             IZoraCreator1155PremintExecutor preminterAtProxy,
             PremintConfigV2 memory premintConfig,
             bytes memory signature
-        ) = createAndSignPremintV2(premintExecutorProxyAddress, payoutRecipient);
+        ) = createAndSignPremintV2(premintExecutorProxyAddress, payoutRecipient, 100);
 
         uint256 quantityToMint = 1;
         // execute the premint
@@ -141,7 +136,7 @@ contract DeploymentTestingUtils is Script {
     }
 
     function signPremint(PremintConfigV2 memory premintConfig, address deterministicAddress, uint256 privateKey) private view returns (bytes memory signature) {
-        bytes32 signatureVersion = ZoraCreator1155Attribution.HASHED_VERSION_2;
+        bytes32 signatureVersion = PremintEncoding.HASHED_VERSION_2;
         bytes32 structHash = ZoraCreator1155Attribution.hashPremint(premintConfig);
         // sign the premint
         bytes32 digest = ZoraCreator1155Attribution.premintHashedTypeDataV4(structHash, deterministicAddress, signatureVersion, block.chainid);
@@ -155,7 +150,7 @@ contract DeploymentTestingUtils is Script {
     }
 
     function signPremint(PremintConfig memory premintConfig, address deterministicAddress, uint256 privateKey) private view returns (bytes memory signature) {
-        bytes32 signatureVersion = ZoraCreator1155Attribution.HASHED_VERSION_1;
+        bytes32 signatureVersion = PremintEncoding.HASHED_VERSION_1;
         bytes32 structHash = ZoraCreator1155Attribution.hashPremint(premintConfig);
         // sign the premint
         bytes32 digest = ZoraCreator1155Attribution.premintHashedTypeDataV4(structHash, deterministicAddress, signatureVersion, block.chainid);

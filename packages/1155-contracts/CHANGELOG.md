@@ -1,5 +1,51 @@
 # @zoralabs/zora-1155-contracts
 
+## 2.9.0
+
+### Minor Changes
+
+- 50a4e09: 
+  - Zora Creator 1155 contracts use the MINTs contracts to get the mint fee, mint, and redeem a mint ticket upon minting.
+  - `ZoraCreator1155Impl` adds a new method `mintWithMints` that allows for minting with MINTs that are already owned.
+  - 50a4e09: - Zora Creator 1155 contracts no longer have a public facing function `computeFreeMintRewards` and `computePaidMintRewards`
+  - protocol rewards calculation logic has been refactored and moved from the RewardSplits contract to the ZoraCreator1155Impl itself to save on contract size.
+  - remove `ZoraCreator1155Impl.adminMintBatch` to save contract size
+  - 50a4e09: - To support the MINTs contract passing the first minter as an argument to `premintV2WithSignerContract` - we add the field `firstMinter` to `premintV2WithSignerContract`, and then in the 1155 check that the firstMinter argument is not address(0) since it now can be passed in manually.
+
+### ZoraCreator1155Impl rewards splits are percentage based instead of a fixed value. 
+
+Prior to 2.9.0, rewards were distributed based on a fixed value in ETH per token minted. From 2.9.0 rewards are distributed based on a percentage of the total reward collected for a mint.  The following table breaks down the reward splits for both free and paid mints before and after 2.9.0:
+
+| Reward Type | Free Mints (Prior to 2.9.0) | Paid Mints (Prior to 2.9.0) | Free Mints (After 2.9.0) | Paid Mints (After 2.9.0) |
+|-------------|-----------------------------|-----------------------------|--------------------------|--------------------------|
+| Creator Reward | 0.000333 ETH per token | - | 42.8571% of total reward | - |
+| First Minter Reward | 0.000111 ETH | 0.000111 ETH per token | 14.2285% | 28.5714% of total reward |
+| Create Referral Reward | 0.000111 ETH | 0.000222 ETH | 14.2285% | 28.5714% |
+| Mint Referral Reward | 0.000111 ETH | 0.000222 ETH | 14.2285% | 28.5714% |
+| Zora Platform Reward | 0.000111 ETH | 0.000222 ETH | 14.2285% | 28.5714% |
+
+## 2.8.1
+
+### Patch Changes
+
+- c2a0a2b: Moved dev time dependencies to devDependencies since they are not needed by external users of the package, they are only used for codegen
+
+## 2.8.0
+
+### Minor Changes
+
+- 13a4785: Adds ERC20 Minter contract which enables zora 1155 creator NFTs to be minted with ERC20 tokens
+
+### Patch Changes
+
+- 13a4785: Adds first minter reward to ERC20 Minter
+- 1cf02a4: Add ERC7572 ContractURIUpdated() event for indexing
+- 079a596: Moved shared functionality into shared-contracts. premintWithSignerContract takes firstMinter as an argument
+
+## 2.8
+
+- 13a4785: Adds ERC20 Minter which allows users to mint NFTs with ERC20 tokens.
+
 ## 2.7.3
 
 ### Patch Changes
